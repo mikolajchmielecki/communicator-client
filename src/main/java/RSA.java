@@ -12,10 +12,15 @@ public class RSA {
 
     private KeyPair pair;
 
-    public RSA() throws NoSuchAlgorithmException {
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-        generator.initialize(OUTPUT_SIZE_BITS);
-        this.pair = generator.generateKeyPair();
+    public RSA() {
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            generator.initialize(OUTPUT_SIZE_BITS);
+            this.pair = generator.generateKeyPair();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public PublicKey getPublic() {

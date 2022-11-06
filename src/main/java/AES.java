@@ -1,17 +1,13 @@
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 public class AES {
 
-
     public static String encrypt(String data, String key) throws Exception {
-        Cipher encryptionCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        SecretKey secretKey = secretKeyFromString(key);
-        IvParameterSpec parameterSpec = new IvParameterSpec(secretKey.getEncoded());
-        encryptionCipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec);
+        Cipher encryptionCipher = Cipher.getInstance("AES");
+        encryptionCipher.init(Cipher.ENCRYPT_MODE, secretKeyFromString(key));
         byte[] encryptedMessageBytes =
                 encryptionCipher.doFinal(data.getBytes());
         String encryptedMessage =
@@ -20,10 +16,8 @@ public class AES {
     }
 
     public static String decrypt(String encryptedData, String key) throws Exception {
-        Cipher decryptionCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        SecretKey secretKey = secretKeyFromString(key);
-        IvParameterSpec parameterSpec = new IvParameterSpec(secretKey.getEncoded());
-        decryptionCipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
+        Cipher decryptionCipher = Cipher.getInstance("AES");
+        decryptionCipher.init(Cipher.DECRYPT_MODE, secretKeyFromString(key));
         byte[] decryptedMessageBytes =
                 decryptionCipher.doFinal(Base64.getDecoder().decode(encryptedData));
         String decryptedMessage = new String(decryptedMessageBytes);
