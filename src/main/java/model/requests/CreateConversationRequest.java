@@ -18,6 +18,7 @@ public record CreateConversationRequest(String name, List<String> users) {
             user = scanner.nextLine();
             if(!user.isEmpty()){
                 list.add(user);
+            } else {
                 break;
             }
 

@@ -2,6 +2,8 @@ import com.google.common.hash.Hashing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -17,7 +19,7 @@ import java.util.Scanner;
 public class Client {
 
     private static final String connectionMessage = "Hi!";
-    private static final String SERVER_IP = "192.168.0.110";
+    private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 16123;
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
@@ -37,7 +39,6 @@ public class Client {
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         out.println(connectionMessage);
         int currentPort = Integer.parseInt(in.readLine());
-        System.out.println("port =" + currentPort);
         clientSocket.close();
 
         // connection on new port
@@ -50,7 +51,7 @@ public class Client {
 
         String serverPublicKeyMessage = in.readLine();
         String decodedServerKey = Encryption.decryptLong(serverPublicKeyMessage, clientPrivateKey);
-        log.info("SERVER PUBLIC KEY = " + decodedServerKey);
+        log.debug("SERVER PUBLIC KEY = " + decodedServerKey);
 
         // get server public key as object
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -59,41 +60,39 @@ public class Client {
 
         // send control message
         String controlMessage = controlMessageGenerator(100);
-        log.info("CONTROL MESSAGE = " + controlMessage);
+        log.debug("CONTROL MESSAGE = " + controlMessage);
         String encodedControlMessage = Encryption.encryptLong(controlMessage, serverPublicKey);
-        log.info("ENCODED CONTROL MESSAGE = " + encodedControlMessage);
+        log.debug("ENCODED CONTROL MESSAGE = " + encodedControlMessage);
         out.println(encodedControlMessage);
 
         // get control message hash from server
         String controlHashFromServer = in.readLine();
-        log.info("CONTROL HASH = " + controlHashFromServer);
+        log.debug("CONTROL HASH = " + controlHashFromServer);
 
         // decode hash
         String decodedHashFromServer = Encryption.decryptLong(controlHashFromServer, clientPrivateKey);
-        log.info("ENCODED CONTROL HASH = " + decodedHashFromServer);
+        log.debug("ENCODED CONTROL HASH = " + decodedHashFromServer);
 
         // hash control message in client
         String controlHashTest = Hashing
                 .sha256()
                 .hashString(controlMessage + clientPublicKeyString, StandardCharsets.UTF_8)
                 .toString();
-        log.info("CLIENT CODED HASH = " + controlHashTest);
+        log.debug("CLIENT CODED HASH = " + controlHashTest);
 
         // check is hash the same
         if (controlHashTest.equals(decodedHashFromServer)) {
-            log.info("SERVER VERIFIED");
-            out.println("{\"action\": \"login\", \"body\":{\"login\":\"login2\",\"password\":\"haslo2\"}}");
-            String status = in.readLine();
-            log.info("STATUS: " + status);
+            String aesKey = generateAESKey();
+            out.println(Encryption.encryptLong(aesKey, serverPublicKey));
 
 
             Scanner scanner = new Scanner(System.in);
-            Application app = new Application(scanner, kp, serverPublicKey, in, out);
+            Application app = new Application(scanner, aesKey, in, out);
             app.run();
             scanner.close();
 
         } else {
-            log.info("SERVER IS NOT TRUSTED");
+            log.debug("SERVER IS NOT TRUSTED");
         }
     }
 
@@ -101,6 +100,12 @@ public class Client {
         byte[] array = new byte[length];
         new Random().nextBytes(array);
         return Base64.getEncoder().encodeToString(array);
+    }
+
+    private static String generateAESKey() throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        SecretKey key = keyGenerator.generateKey();
+        return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
 }

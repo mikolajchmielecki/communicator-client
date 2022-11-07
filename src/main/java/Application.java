@@ -1,3 +1,4 @@
+import hybrid.AES;
 import model.requests.*;
 import model.responses.GetMessagesResponse;
 import model.responses.ListConversationsResponse;
@@ -15,15 +16,13 @@ import java.util.Scanner;
 public class Application {
 
     private Scanner scanner;
-    private KeyPair keyPair;
-    private PublicKey serverPublicKey;
+    private String aesKey;
     private BufferedReader in;
     private PrintWriter out;
 
-    public Application(Scanner scanner, KeyPair clientKeyPair, PublicKey serverPublicKey, BufferedReader in, PrintWriter out) {
+    public Application(Scanner scanner, String aesKey, BufferedReader in, PrintWriter out) {
         this.scanner = scanner;
-        this.keyPair = clientKeyPair;
-        this.serverPublicKey = serverPublicKey;
+        this.aesKey = aesKey;
         this.in = in;
         this.out = out;
     }
@@ -134,9 +133,9 @@ public class Application {
     }
 
     private String sendAndReceive(String message) throws Exception {
-        String encrypted = Encryption.encryptLong(message, serverPublicKey);
+        String encrypted = AES.encrypt(message, aesKey);
         out.println(encrypted);
-        return Encryption.decryptLong(in.readLine(), keyPair.getPrivate());
+        return AES.decrypt(in.readLine(), aesKey);
     }
 
 }

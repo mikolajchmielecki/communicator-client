@@ -19,7 +19,7 @@ public record MessageRequest(String conversation, String content) {
                 "\"message\", " +
                 "\"body\": { " +
                 "\"conversation\": \"" + conversation + "\", " +
-                "\"content\": " + content + "\"" +
+                "\"content\": \"" + content + "\"" +
                 "}" +
                 "}";
     }
