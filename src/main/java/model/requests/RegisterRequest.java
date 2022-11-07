@@ -18,7 +18,7 @@ public record RegisterRequest(String login, String password) {
                 "\"register\", " +
                 "\"body\": { " +
                 "\"login\": \"" + login + "\", " +
-                "\"password\": " + password + "\"" +
+                "\"password\": \"" + password + "\"" +
                 "}" +
                 "}";
     }

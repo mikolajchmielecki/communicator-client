@@ -19,7 +19,7 @@ public record LoginRequest(String login, String password) {
                 "\"login\", " +
                 "\"body\": { " +
                 "\"login\": \"" + login + "\", " +
-                "\"password\": " + password + "\"" +
+                "\"password\": \"" + password + "\"" +
                 "}" +
                 "}";
     }

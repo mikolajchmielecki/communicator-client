@@ -23,4 +23,10 @@ public class GetConversationMessagesResponse extends ResponseAbstract {
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public String toString() {
+        List<Message> messages = getConversationMessages();
+        return "Lista nowych wiadomości: " + messages.stream().map(Object::toString).collect(Collectors.joining("[", ", ", "]"));
+    }
+
 }

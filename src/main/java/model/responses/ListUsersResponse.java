@@ -14,4 +14,9 @@ public class ListUsersResponse extends ResponseAbstract {
         return getBody().get("users").getAsJsonArray().asList().stream().map(e -> e.getAsString()).collect(Collectors.toList());
     }
 
+    @Override
+    public String toString() {
+        return "Lista użytkowników: " + getUsers().stream().collect(Collectors.joining());
+    }
+
 }
