@@ -16,7 +16,17 @@ public class ListUsersResponse extends ResponseAbstract {
 
     @Override
     public String toString() {
-        return "Lista użytkowników: " + getUsers().stream().collect(Collectors.joining());
+        List<String> users = getUsers();
+
+        StringBuilder stringBuilder = new StringBuilder("");
+        stringBuilder.append("Użytkownicy:\n");
+
+        users.forEach(u -> {
+            stringBuilder.append(u + "; ");
+        });
+        stringBuilder.append("\n\n");
+
+        return stringBuilder.toString();
     }
 
 }

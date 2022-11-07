@@ -27,7 +27,20 @@ public class GetMessagesResponse extends ResponseAbstract {
         return result;
     }
 
+    @Override
+    public String toString() {
+        Map<String, List<Message>> messages = getMessageUpdatedMessages();
+        StringBuilder stringBuilder = new StringBuilder("");
 
+        messages.keySet().forEach(k -> {
+            //result += "Nazwa konwersacji:" + k;
+            stringBuilder.append("Nazwa konwersacji:" + k + "\n");
+            messages.get(k).forEach(m -> {
+                stringBuilder.append("Nadawca: " + m.author() + "\nData: " + m.dateTime() + "\nZawartość: \n" + m.content() + "\n\n");
+            });
+            stringBuilder.append("\n\n");
+        });
 
-
+        return stringBuilder.toString();
+    }
 }

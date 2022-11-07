@@ -97,7 +97,7 @@ public class Application {
         out.println(request);
         String response = in.readLine();
         ListUsersResponse listUsersResponse = new ListUsersResponse(response);
-        System.out.println(response);
+        System.out.println(listUsersResponse);
     }
 
     private void listConversations() throws IOException {
@@ -105,7 +105,7 @@ public class Application {
         out.println(request);
         String response = in.readLine();
         ListConversationsResponse listConversationsResponse = new ListConversationsResponse(response);
-        System.out.println(response);
+        System.out.println(listConversationsResponse);
     }
 
     private void newConversation() throws IOException {
@@ -121,7 +121,7 @@ public class Application {
         out.println(request);
         String response = in.readLine();
         GetMessagesResponse getMessagesResponse = new GetMessagesResponse(response);
-        System.out.println(response);
+        System.out.println(getMessagesResponse);
     }
 
     private void messagesForConversation() throws IOException {
@@ -129,7 +129,7 @@ public class Application {
         out.println(request);
         String response = in.readLine();
         ListConversationsResponse listConversationsResponse = new ListConversationsResponse(response);
-        System.out.println(response);
+        System.out.println(listConversationsResponse);
     }
 
     private String sendAndReceive(String message) throws Exception {

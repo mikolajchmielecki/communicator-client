@@ -1,5 +1,7 @@
 package model.responses;
 
+import model.Message;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,5 +21,19 @@ public class ListConversationsResponse extends ResponseAbstract {
         return result;
     }
 
+    @Override
+    public String toString() {
+        Map<String, List<String>> conversations = getConversations();
 
+        StringBuilder stringBuilder = new StringBuilder("");
+
+        conversations.keySet().forEach(k -> {
+            stringBuilder.append("Nazwa konwersacji:" + k + "\nUżytkownicy:\n");
+            conversations.get(k).forEach(u -> {
+                stringBuilder.append(u + "; ");
+            });
+            stringBuilder.append("\n\n");
+        });
+        return stringBuilder.toString();
+    }
 }
