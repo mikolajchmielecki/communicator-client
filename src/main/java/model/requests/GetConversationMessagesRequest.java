@@ -1,6 +1,6 @@
 package model.requests;
 
-public record GetConversationMessages(String conversation) {
+public record GetConversationMessagesRequest(String conversation) {
 
     @Override
     public String toString() {

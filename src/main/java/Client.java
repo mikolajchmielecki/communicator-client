@@ -2,6 +2,8 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import com.google.common.io.CharSource;
 import com.google.common.io.Files;
+import model.Application;
+import model.requests.RegisterRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,7 @@ import java.security.*;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Random;
+import java.util.Scanner;
 
 
 public class Client {
@@ -87,55 +90,9 @@ public class Client {
             String status = in.readLine();
             LOGGER.info("STATUS: " + status);
 
-            // create conversation
-            File file = new File("create_conversation_json.txt");
-            CharSource source = Files.asCharSource(file, Charsets.UTF_8);
-            String createConversationMessage = source.read();
-            System.out.println(createConversationMessage);
 
-            out.println(createConversationMessage);
-
-            File file2 = new File("message_json.txt");
-            CharSource source2 = Files.asCharSource(file2, Charsets.UTF_8);
-            String messageJson = source2.read();
-
-            File file3 = new File("user_list_json.txt");
-            CharSource source3 = Files.asCharSource(file3, Charsets.UTF_8);
-            String messageJson3 = source3.read();
-
-            out.println(messageJson3);
-            String listUsers = in.readLine();
-            System.out.println(listUsers);
-
-            for(int i = 0; i < 5; i++){
-                Thread.sleep(1000);
-                String currentMessage = messageJson
-                        .replace("[1]", "testConversation")
-                        .replace("[2]", "test test test");
-                out.println(currentMessage);
-                String response = in.readLine();
-                LOGGER.info("MESSAGE: " + response);
-            }
-
-            File file4 = new File("get_messages.txt");
-            CharSource source4 = Files.asCharSource(file4, Charsets.UTF_8);
-            String messageJson4 = source4.read();
-
-            File file5 = new File("get_all_conversations.txt");
-            CharSource source5 = Files.asCharSource(file5, Charsets.UTF_8);
-            String messageJson5 = source5.read();
-
-            out.println(messageJson5);
-            String messagesList = in.readLine();
-            System.out.println(messagesList);
-
-
-            while(true){
-                Thread.sleep(5000);
-                out.println(messageJson4);
-                String listMessages = in.readLine();
-                System.out.println(listMessages);
-            }
+            Application app = new Application();
+            app.run(kp, serverPublicKey, in, out);
 
         } else {
             LOGGER.info("SERVER IS NOT TRUSTED");
