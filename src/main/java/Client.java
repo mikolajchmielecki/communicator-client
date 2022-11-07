@@ -1,4 +1,5 @@
 import com.google.common.hash.Hashing;
+import hybrid.Encryption;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;

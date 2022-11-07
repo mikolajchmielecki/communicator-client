@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EncryptionTest {
 
-    private Encryption encryption = new Encryption();
+    private Hybrid encryption = new Hybrid();
 
     @Test
     public void encryptionTest() {
