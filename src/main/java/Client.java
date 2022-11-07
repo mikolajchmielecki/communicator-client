@@ -76,8 +76,8 @@ public class Client {
         String decryptedServerPublicKey = Encryption.decryptLong(serverPublicKeyEncrypted, clientPrivateKey);
         PublicKey serverPublicKey = decryptPublicKey(decryptedServerPublicKey);
         String controlMessage = controlMessageGenerator(100);
-        String encodedControlMessage = Encryption.encryptLong(controlMessage, serverPublicKey);
-        out.println(encodedControlMessage);
+        String encryptedControlMessage = Encryption.encryptLong(controlMessage, serverPublicKey);
+        out.println(encryptedControlMessage);
 
         String controlHashFromServer = in.readLine();
 

@@ -26,7 +26,7 @@ public class Application {
 
     public void run() {
         while(true) {
-            System.out.println("Wybierz pozycję menu: \n1. Rejestracja\n2. Logowanie\n3. Wyślij wiadomość\n4. Wyświetl listę użytkowników\n5. Wyświetl listę konwersjacji\n6. Nowa konwersjacja\n7. Nowe wiadomości\n8. Wiadomości z konwersacji\n9. Koniec");
+            System.out.println("Wybierz pozycję menu: \n1. Rejestracja\n2. Logowanie\n3. Wyślij wiadomość\n4. Wyświetl listę użytkowników\n5. Wyświetl listę konwersacji\n6. Nowa konwersacja\n7. Nowe wiadomości\n8. Wiadomości z konwersacji\n9. Koniec");
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
 
