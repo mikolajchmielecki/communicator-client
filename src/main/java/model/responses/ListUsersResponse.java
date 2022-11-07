@@ -16,17 +16,21 @@ public class ListUsersResponse extends ResponseAbstract {
 
     @Override
     public String toString() {
-        List<String> users = getUsers();
+        if (getStatus() == 200) {
+            List<String> users = getUsers();
 
-        StringBuilder stringBuilder = new StringBuilder("");
-        stringBuilder.append("Użytkownicy:\n");
+            StringBuilder stringBuilder = new StringBuilder("");
+            stringBuilder.append("Użytkownicy:\n");
 
-        users.forEach(u -> {
-            stringBuilder.append(u + "; ");
-        });
-        stringBuilder.append("\n\n");
+            users.forEach(u -> {
+                stringBuilder.append(u + "; ");
+            });
+            stringBuilder.append("\n\n");
 
-        return stringBuilder.toString();
+            return stringBuilder.toString();
+        } else {
+            return getResponse();
+        }
     }
 
 }

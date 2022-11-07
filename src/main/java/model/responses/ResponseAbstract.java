@@ -23,4 +23,9 @@ public class ResponseAbstract {
     protected JsonObject getBody() {
         return root.getAsJsonObject().get("body").getAsJsonObject();
     }
+
+    @Override
+    public String toString() {
+        return getResponse() + "\n";
+    }
 }

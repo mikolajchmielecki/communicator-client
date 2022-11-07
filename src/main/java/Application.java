@@ -1,9 +1,6 @@
 import hybrid.AES;
 import model.requests.*;
-import model.responses.GetMessagesResponse;
-import model.responses.ListConversationsResponse;
-import model.responses.ListUsersResponse;
-import model.responses.ResponseAbstract;
+import model.responses.*;
 import org.checkerframework.checker.units.qual.A;
 
 import java.io.BufferedReader;
@@ -72,21 +69,21 @@ public class Application {
         RegisterRequest request = RegisterRequest.create(scanner);
         String response = sendAndReceive(request.toString());
         ResponseAbstract responseObject = new ResponseAbstract(response);
-        System.out.println(response);
+        System.out.println(responseObject);
     }
 
     private void login() throws Exception {
         LoginRequest request = LoginRequest.create(scanner);
         String response = sendAndReceive(request.toString());
         ResponseAbstract responseObject = new ResponseAbstract(response);
-        System.out.println(response);
+        System.out.println(responseObject);
     }
 
     private void sendMessage() throws Exception {
         MessageRequest request = MessageRequest.create(scanner);
         String response = sendAndReceive(request.toString());
         ResponseAbstract responseObject = new ResponseAbstract(response);
-        System.out.println(response);
+        System.out.println(responseObject);
     }
 
     private void listUsers() throws Exception {
@@ -107,7 +104,7 @@ public class Application {
         CreateConversationRequest request = CreateConversationRequest.create(scanner);
         String response = sendAndReceive(request.toString());
         ResponseAbstract newConversationResponse = new ResponseAbstract(response);
-        System.out.println(response);
+        System.out.println(newConversationResponse);
     }
 
     private void newMessages() throws Exception {
@@ -120,8 +117,8 @@ public class Application {
     private void messagesForConversation() throws Exception {
         GetConversationMessagesRequest request = GetConversationMessagesRequest.create(scanner);
         String response = sendAndReceive(request.toString());
-        ListConversationsResponse listConversationsResponse = new ListConversationsResponse(response);
-        System.out.println(listConversationsResponse);
+        GetConversationMessagesResponse getConversationMessagesResponse = new GetConversationMessagesResponse(response);
+        System.out.println(getConversationMessagesResponse);
     }
 
     private String sendAndReceive(String message) throws Exception {

@@ -3,6 +3,7 @@ package model.responses;
 import model.Message;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class GetMessagesResponse extends ResponseAbstract {
             result.put(o.get("conversation").getAsString(), o.get("messages").getAsJsonArray().asList().stream().map(e -> e.getAsJsonObject()).map((e) -> {
                 String author = e.get("author").getAsString();
                 String content = e.get("content").getAsString();
-                LocalDateTime dateTime = LocalDateTime.parse(e.get("dateTime").getAsString());
+                LocalDateTime dateTime = LocalDateTime.parse(e.get("dateTime").getAsString(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
                 return new Message(author, content, dateTime);
             }).collect(Collectors.toList()));
         });
@@ -29,18 +30,22 @@ public class GetMessagesResponse extends ResponseAbstract {
 
     @Override
     public String toString() {
-        Map<String, List<Message>> messages = getMessageUpdatedMessages();
-        StringBuilder stringBuilder = new StringBuilder("");
+        if (getStatus() == 200) {
+            Map<String, List<Message>> messages = getMessageUpdatedMessages();
+            StringBuilder stringBuilder = new StringBuilder("");
 
-        messages.keySet().forEach(k -> {
-            //result += "Nazwa konwersacji:" + k;
-            stringBuilder.append("Nazwa konwersacji:" + k + "\n");
-            messages.get(k).forEach(m -> {
-                stringBuilder.append("Nadawca: " + m.author() + "\nData: " + m.dateTime() + "\nZawartość: \n" + m.content() + "\n\n");
+            messages.keySet().forEach(k -> {
+                //result += "Nazwa konwersacji:" + k;
+                stringBuilder.append("Nazwa konwersacji:" + k + "\n");
+                messages.get(k).forEach(m -> {
+                    stringBuilder.append("Nadawca: " + m.author() + "\nData: " + m.dateTime() + "\nZawartość: \n" + m.content() + "\n\n");
+                });
+                stringBuilder.append("\n\n");
             });
-            stringBuilder.append("\n\n");
-        });
 
-        return stringBuilder.toString();
+            return stringBuilder.toString();
+        } else {
+            return getResponse();
+        }
     }
 }
