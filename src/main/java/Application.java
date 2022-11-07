@@ -68,66 +68,58 @@ public class Application {
         }
     }
 
-    private void register() throws IOException {
+    private void register() throws Exception {
         RegisterRequest request = RegisterRequest.create(scanner);
-        out.println(request);
-        String response = in.readLine();
+        String response = sendAndReceive(request.toString());
         ResponseAbstract responseObject = new ResponseAbstract(response);
         System.out.println(response);
     }
 
-    private void login() throws IOException {
+    private void login() throws Exception {
         LoginRequest request = LoginRequest.create(scanner);
-        out.println(request);
-        String response = in.readLine();
+        String response = sendAndReceive(request.toString());
         ResponseAbstract responseObject = new ResponseAbstract(response);
         System.out.println(response);
     }
 
-    private void sendMessage() throws IOException {
+    private void sendMessage() throws Exception {
         MessageRequest request = MessageRequest.create(scanner);
-        out.println(request);
-        String response = in.readLine();
+        String response = sendAndReceive(request.toString());
         ResponseAbstract responseObject = new ResponseAbstract(response);
         System.out.println(response);
     }
 
-    private void listUsers() throws IOException {
+    private void listUsers() throws Exception {
         ListUsersRequest request = new ListUsersRequest();
-        out.println(request);
-        String response = in.readLine();
+        String response = sendAndReceive(request.toString());
         ListUsersResponse listUsersResponse = new ListUsersResponse(response);
         System.out.println(listUsersResponse);
     }
 
-    private void listConversations() throws IOException {
+    private void listConversations() throws Exception {
         ListConversationsRequest request = new ListConversationsRequest();
-        out.println(request);
-        String response = in.readLine();
+        String response = sendAndReceive(request.toString());
         ListConversationsResponse listConversationsResponse = new ListConversationsResponse(response);
         System.out.println(listConversationsResponse);
     }
 
-    private void newConversation() throws IOException {
+    private void newConversation() throws Exception {
         CreateConversationRequest request = CreateConversationRequest.create(scanner);
-        out.println(request);
-        String response = in.readLine();
+        String response = sendAndReceive(request.toString());
         ResponseAbstract newConversationResponse = new ResponseAbstract(response);
         System.out.println(response);
     }
 
-    private void newMessages() throws IOException {
+    private void newMessages() throws Exception {
         GetMessagesRequest request = new GetMessagesRequest();
-        out.println(request);
-        String response = in.readLine();
+        String response = sendAndReceive(request.toString());
         GetMessagesResponse getMessagesResponse = new GetMessagesResponse(response);
         System.out.println(getMessagesResponse);
     }
 
-    private void messagesForConversation() throws IOException {
+    private void messagesForConversation() throws Exception {
         GetConversationMessagesRequest request = GetConversationMessagesRequest.create(scanner);
-        out.println(request);
-        String response = in.readLine();
+        String response = sendAndReceive(request.toString());
         ListConversationsResponse listConversationsResponse = new ListConversationsResponse(response);
         System.out.println(listConversationsResponse);
     }

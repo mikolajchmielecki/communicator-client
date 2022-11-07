@@ -1,6 +1,4 @@
 import com.google.common.hash.Hashing;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -10,6 +8,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Random;
@@ -18,82 +17,24 @@ import java.util.Scanner;
 
 public class Client {
 
-    private static final String connectionMessage = "Hi!";
+    private static final String HELLO = "Hi!";
     private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 16123;
-    private static final Logger log = LoggerFactory.getLogger(Client.class);
+
+    private String aesKey;
+    private BufferedReader in;
+    private PrintWriter out;
 
     public static void main(String[] args) throws Exception {
 
-        // generate client keys
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-        kpg.initialize(1024);
-        KeyPair kp = kpg.generateKeyPair();
-        PublicKey clientPublicKey = kp.getPublic();
-        PrivateKey clientPrivateKey = kp.getPrivate();
-        String clientPublicKeyString = Base64.getEncoder().encodeToString(clientPublicKey.getEncoded());
+        Client client = new Client();
+        client.handshake();
 
-        // connect to servers
-        Socket clientSocket = new Socket(SERVER_IP, SERVER_PORT);
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        out.println(connectionMessage);
-        int currentPort = Integer.parseInt(in.readLine());
-        clientSocket.close();
+        Scanner scanner = new Scanner(System.in);
+        Application app = new Application(scanner, client.aesKey, client.in, client.out);
+        app.run();
+        scanner.close();
 
-        // connection on new port
-        Socket connectedSocket = new Socket(SERVER_IP, currentPort);
-        out = new PrintWriter(connectedSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(connectedSocket.getInputStream()));
-
-        // send user public key
-        out.println(clientPublicKeyString);
-
-        String serverPublicKeyMessage = in.readLine();
-        String decodedServerKey = Encryption.decryptLong(serverPublicKeyMessage, clientPrivateKey);
-        log.debug("SERVER PUBLIC KEY = " + decodedServerKey);
-
-        // get server public key as object
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(decodedServerKey));
-        PublicKey serverPublicKey = keyFactory.generatePublic(keySpecX509);
-
-        // send control message
-        String controlMessage = controlMessageGenerator(100);
-        log.debug("CONTROL MESSAGE = " + controlMessage);
-        String encodedControlMessage = Encryption.encryptLong(controlMessage, serverPublicKey);
-        log.debug("ENCODED CONTROL MESSAGE = " + encodedControlMessage);
-        out.println(encodedControlMessage);
-
-        // get control message hash from server
-        String controlHashFromServer = in.readLine();
-        log.debug("CONTROL HASH = " + controlHashFromServer);
-
-        // decode hash
-        String decodedHashFromServer = Encryption.decryptLong(controlHashFromServer, clientPrivateKey);
-        log.debug("ENCODED CONTROL HASH = " + decodedHashFromServer);
-
-        // hash control message in client
-        String controlHashTest = Hashing
-                .sha256()
-                .hashString(controlMessage + clientPublicKeyString, StandardCharsets.UTF_8)
-                .toString();
-        log.debug("CLIENT CODED HASH = " + controlHashTest);
-
-        // check is hash the same
-        if (controlHashTest.equals(decodedHashFromServer)) {
-            String aesKey = generateAESKey();
-            out.println(Encryption.encryptLong(aesKey, serverPublicKey));
-
-
-            Scanner scanner = new Scanner(System.in);
-            Application app = new Application(scanner, aesKey, in, out);
-            app.run();
-            scanner.close();
-
-        } else {
-            log.debug("SERVER IS NOT TRUSTED");
-        }
     }
 
     private static String controlMessageGenerator(int length) {
@@ -106,6 +47,53 @@ public class Client {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
         SecretKey key = keyGenerator.generateKey();
         return Base64.getEncoder().encodeToString(key.getEncoded());
+    }
+
+    private void handshake() throws Exception {
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(1024);
+        KeyPair keyPair = generator.generateKeyPair();
+        PublicKey clientPublicKey = keyPair.getPublic();
+        PrivateKey clientPrivateKey = keyPair.getPrivate();
+        String clientPublicKeyEncoded = Base64.getEncoder().encodeToString(clientPublicKey.getEncoded());
+
+        Socket clientSocket = new Socket(SERVER_IP, SERVER_PORT);
+        PrintWriter portInitOut = new PrintWriter(clientSocket.getOutputStream(), true);
+        BufferedReader portInitIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        portInitOut.println(HELLO);
+        int customPort = Integer.parseInt(portInitIn.readLine());
+        clientSocket.close();
+
+        Thread.sleep(100);
+        Socket connectedSocket = new Socket(SERVER_IP, customPort);
+        this.out = new PrintWriter(connectedSocket.getOutputStream(), true);
+        this.in = new BufferedReader(new InputStreamReader(connectedSocket.getInputStream()));
+
+        out.println(clientPublicKeyEncoded);
+
+        String serverPublicKeyEncrypted = in.readLine();
+        String decryptedServerPublicKey = Encryption.decryptLong(serverPublicKeyEncrypted, clientPrivateKey);
+        PublicKey serverPublicKey = decryptPublicKey(decryptedServerPublicKey);
+        String controlMessage = controlMessageGenerator(100);
+        String encodedControlMessage = Encryption.encryptLong(controlMessage, serverPublicKey);
+        out.println(encodedControlMessage);
+
+        String controlHashFromServer = in.readLine();
+
+        String decodedHashFromServer = Encryption.decryptLong(controlHashFromServer, clientPrivateKey);
+
+        String controlHashTest = Hashing.sha256().hashString(controlMessage + clientPublicKeyEncoded, StandardCharsets.UTF_8).toString();
+        if (!controlHashTest.equals(decodedHashFromServer)) {
+            throw new RuntimeException("Faked server");
+        }
+        this.aesKey = generateAESKey();
+        out.println(Encryption.encryptLong(aesKey, serverPublicKey));
+    }
+
+    private PublicKey decryptPublicKey(String decryptedServerPublicKey) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(decryptedServerPublicKey));
+        return keyFactory.generatePublic(keySpecX509);
     }
 
 }
